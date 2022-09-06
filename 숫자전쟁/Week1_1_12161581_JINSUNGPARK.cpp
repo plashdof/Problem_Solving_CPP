@@ -4,7 +4,39 @@
 using namespace std;
 
 
+vector<int> GCD_factor;
 
+
+
+// 유클리드 호제법으로, 두 수의 GCD 구하는 함수 생성
+
+int GCD(int a, int b) {
+	while (1) {
+		int r = a % b;
+		if (r == 0) return b;
+
+		a = b;
+		b = r;
+
+	}
+}
+
+// 약수 구하는 함수 생성
+
+void factor(int a) {
+	if (a <= 0) {
+		return;
+	}
+
+	GCD_factor.push_back(a);
+
+	for (int i = 1; i <= a / 2; i++) {
+		if (a % i == 0) {
+			GCD_factor.push_back(i);
+		}
+	}
+
+}
 
 
 
@@ -13,11 +45,9 @@ int main() {
 	cin.tie(NULL);
 	cout.tie(NULL);
 	int N;
-	int n;
-	int m;
-	int temp;
 	
-	
+
+
 	cin >> N;
 
 	// 인하왕국 병사수 n  비룡왕국 병사수 m
@@ -25,8 +55,12 @@ int main() {
 	for (int x = 0; x < N; x++) {
 		vector<int> inha_vec;
 		vector<int> birong_vec;
-		vector<int> inha_GDC_vec;
-		vector<int> birong_GDC_vec;
+		int n;
+		int m;
+		int temp;
+		bool flag = false;
+		int result1 = -1;
+		int result2 = -1;
 
 		cin >> n >> m;
 
@@ -40,126 +74,87 @@ int main() {
 			birong_vec.push_back(temp);
 		}
 
-		int Min = 100000000;
-		int min = 0;
-		bool count1 = true;
-		bool count2 = true;
-		int inha_result = 0;
-		int birong_result = 0;
-		int GDC = 0;
-
-
-		for (int i = 0; i < birong_vec.size(); i++) {
-			if (birong_vec[i] < Min) Min = birong_vec[i];
-		}
-
-		min = Min;
-
-
 		// 비룡왕국의 병사들 최대공약수 구하기
 
-		for (int i = min; i >= 2; i--) {
-			for (int j = 0; j < birong_vec.size(); j++) {
-				if (birong_vec[j] % i != 0) {
-					count1 = false;
-					break;
-				}
+		if (birong_vec.size() >= 3) {
+			temp = GCD(birong_vec[0], birong_vec[1]);
+
+			for (int i = 2; i < birong_vec.size(); i++) {
+
+				temp = GCD(temp, birong_vec[i]);
 			}
-
-			if (count1 == true) {
-				GDC = i;
-				break;
-			}
-			
-			count1 = true;
 		}
-
-		// 비룡왕국의 병사들 최대공약수의 약수들 구하기
-
-		for (int i = GDC; i >= 1; i--) {
-			if (GDC % i == 0) birong_GDC_vec.push_back(i);
+		else if(birong_vec.size() == 2) {
+			temp = GCD(birong_vec[0], birong_vec[1]);
 		}
+		else {
+			temp = birong_vec[0];
+		}
+		
 
-		// 최대공약수의 약수들중, 인하왕국 병사의 약수 아닌것 판별
+		// 비룡왕국의 병사 최대공약수의 약수들 구하기
+		factor(temp);
 
-		for (int i = 0; i < birong_GDC_vec.size(); i++) {
+
+
+		for (int i = 0; i < GCD_factor.size(); i++) {
 			for (int j = 0; j < inha_vec.size(); j++) {
-				if (inha_vec[j] > birong_GDC_vec[i] && inha_vec[j] % birong_GDC_vec[i] == 0) {
-					count2 = false;
-					break;
+				if (inha_vec[j] >= GCD_factor[i] &&  inha_vec[j] % GCD_factor[i] == 0) {
+					flag = true;
 				}
 			}
 
-			if (count2 == true) {
-				inha_result = birong_GDC_vec[i];
-				break;
+			if (flag == false) {
+				result1 = GCD_factor[i];
 			}
-
-			count2 = true;
 		}
 
 
-		Min = 100000000;
-		min = 0;
-
-		for (int i = 0; i < inha_vec.size(); i++) {
-			if (inha_vec[i] < Min) Min = inha_vec[i];
-		}
-		min = Min;
+		GCD_factor.clear();
+		flag = false;
 
 
 		// 인하왕국의 병사들 최대공약수 구하기
-		count1 = true;
 
-		for (int i = min; i >= 2; i--) {
-			for (int j = 0; j < inha_vec.size(); j++) {
-				if (inha_vec[j] % i != 0) {
-					count1 = false;
-					break;
-				}
+		if (inha_vec.size() >= 3) {
+			temp = GCD(inha_vec[0], inha_vec[1]);
+
+			for (int i = 2; i < inha_vec.size(); i++) {
+
+				temp = GCD(temp, inha_vec[i]);
 			}
-
-			if (count1 == true) {
-				GDC = i;
-				break;
-			}
-
-			count1 = true;
+		}
+		else if (inha_vec.size() == 2) {
+			temp = GCD(inha_vec[0], inha_vec[1]);
+		}
+		else {
+			temp = inha_vec[0];
 		}
 
-		// 비룡왕국의 병사들 최대공약수의 약수들 구하기
+		
 
-		for (int i = GDC; i >= 1; i--) {
-			if (GDC % i == 0) inha_GDC_vec.push_back(i);
-		}
+		// 인하왕국의 병사 최대공약수의 약수들 구하기
+		factor(temp);
 
-		// 최대공약수의 약수들중, 인하왕국 병사의 약수 아닌것 판별
 
-		count2 = true;
 
-		for (int i = 0; i < inha_GDC_vec.size(); i++) {
+		for (int i = 0; i < GCD_factor.size(); i++) {
 			for (int j = 0; j < birong_vec.size(); j++) {
-				if (birong_vec[j] > inha_GDC_vec[i] && birong_vec[j] % inha_GDC_vec[i] == 0) {
-					count2 = false;
-					break;
+				if (birong_vec[j] >= GCD_factor[i] && birong_vec[j] % GCD_factor[i] == 0) {
+					flag = true;
 				}
 			}
 
-			if (count2 == true) {
-				birong_result = inha_GDC_vec[i];
-				break;
+			if (flag == false) {
+				result2 = GCD_factor[i];
 			}
-
-			count2 = true;
 		}
 
-		if (inha_result == 0) inha_result = -1;
-		if (birong_result == 0) birong_result = -1;
 
-		cout << inha_result << " " << birong_result << "\n";
+		cout << result1 << " " << result2 << "\n";
+
+
+		GCD_factor.clear();
 		
 	}
-
-	
-
 }
